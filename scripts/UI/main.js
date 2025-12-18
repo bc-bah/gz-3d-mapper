@@ -45,17 +45,38 @@ $(function() {
 
 	function initializeMap() {
 
-		mapboxgl.accessToken = 'pk.eyJ1IjoicmcyOCIsImEiOiJjbGRsaXk3cXQwMjZuM3VvaGhya3N4dXN6In0.Ust9rPKtGmAMuTDCKaYIrA';
+		// MapLibre GL doesn't require access token for basic usage
+		// Using OpenStreetMap-based style for open source compatibility
 
-		map = new mapboxgl.Map({
+		map = new maplibregl.Map({
 			container: 'map-view',
-			style: 'mapbox://styles/aliashraf/ck6lw9nr80lvo1ipj8zovttdx',
+			style: 'https://demotiles.maplibre.org/style.json', // Open source style
 			center: [-73.983652, 40.755024], 
 			zoom: 12
 		});
 
-		geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken });
-		var control = map.addControl(geocoder);
+		// Wait for map to load before adding controls
+		map.on('load', function() {
+			console.log('Map loaded successfully');
+			
+			// Debug: Check what's available
+			console.log('Available globals:');
+			console.log('maplibregl:', typeof maplibregl);
+			console.log('MaplibreDraw:', typeof MaplibreDraw);
+			console.log('window.MaplibreDraw:', typeof window.MaplibreDraw);
+			console.log('DrawRectangle:', typeof DrawRectangle);
+			
+			// Initialize center point if available
+			if (typeof initializeCenterPoint === 'function') {
+				initializeCenterPoint(map);
+			}
+			
+			initializeRectangleTool();
+		});
+
+		// Skip geocoder initialization to avoid warnings
+		// The search functionality will work via manual location entry
+		console.log('Geocoder disabled to prevent warnings');
 	}
 
 	function initializeMaterialize() {
@@ -114,13 +135,51 @@ $(function() {
 
 	function initializeRectangleTool() {
 		
-		var modes = MapboxDraw.modes;
-		modes.draw_rectangle = DrawRectangle.default;
-
-		draw = new MapboxDraw({
-			modes: modes
-		});
-		map.addControl(draw);
+		console.log('Initializing rectangle tool...');
+		
+		// Check for MapLibre GL Draw library with Mapbox fallback
+		var DrawClass = null;
+		if (typeof MapboxDraw !== 'undefined') {
+			DrawClass = MapboxDraw;
+			console.log('✅ Found MapboxDraw (compatible with MapLibre)');
+		} else if (window.MapboxDraw) {
+			DrawClass = window.MapboxDraw;
+			console.log('✅ Found window.MapboxDraw');
+		} else if (typeof MaplibreDraw !== 'undefined') {
+			DrawClass = MaplibreDraw;
+			console.log('✅ Found MaplibreDraw');
+		} else if (window.MaplibreDraw) {
+			DrawClass = window.MaplibreDraw;
+			console.log('✅ Found window.MaplibreDraw');
+		} else {
+			console.error('❌ No drawing library found!');
+			console.log('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('draw')));
+			
+			// Create a fallback message
+			document.getElementById('map-view').insertAdjacentHTML('afterbegin', 
+				'<div style="position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 1000;">Drawing tools failed to load</div>');
+			return;
+		}
+		
+		// Simple check and fallback approach
+		try {
+			draw = new DrawClass({
+				displayControlsDefault: true
+			});
+			
+			console.log('Draw instance created:', draw);
+			map.addControl(draw);
+			console.log('Draw control added successfully');
+			
+			// Add success indicator
+			document.getElementById('map-view').insertAdjacentHTML('afterbegin', 
+				'<div style="position: absolute; top: 10px; right: 10px; background: green; color: white; padding: 5px; z-index: 1000;">Drawing tools loaded ✓</div>');
+			
+		} catch (error) {
+			console.error('Error initializing drawing tools:', error);
+			document.getElementById('map-view').insertAdjacentHTML('afterbegin', 
+				'<div style="position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 1000;">Error: ' + error.message + '</div>');
+		}
 
 		map.on('draw.create', function (e) {
 			M.Toast.dismissAll();
@@ -310,7 +369,7 @@ $(function() {
 		var content = "X, Y, Z<br/><b>" + x + ", " + y + ", " + maxZoom + "</b><hr/>";
 		content += "Lat, Lng<br/><b>" + e.lngLat.lat + ", " + e.lngLat.lng + "</b>";
 
-        new mapboxgl.Popup()
+        new maplibregl.Popup()
             .setLngLat(e.lngLat)
             .setHTML(content)
             .addTo(map);
@@ -338,10 +397,10 @@ $(function() {
 
 	function getTileRect(x, y, zoom) {
 
-		var c1 = new mapboxgl.LngLat(tile2long(x, zoom), tile2lat(y, zoom));
-		var c2 = new mapboxgl.LngLat(tile2long(x + 1, zoom), tile2lat(y + 1, zoom));
+		var c1 = new maplibregl.LngLat(tile2long(x, zoom), tile2lat(y, zoom));
+		var c2 = new maplibregl.LngLat(tile2long(x + 1, zoom), tile2lat(y + 1, zoom));
 
-		return new mapboxgl.LngLatBounds(c1, c2);
+		return new maplibregl.LngLatBounds(c1, c2);
 	}
 
 
@@ -399,7 +458,7 @@ $(function() {
 
 		var bounds = coordinates.reduce(function(bounds, coord) {
 			return bounds.extend(coord);
-		}, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+		}, new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
 
 		return bounds;
 	}
@@ -851,7 +910,7 @@ $(function() {
 			helipadIcon.style.backgroundRepeat = 'no-repeat';
 			helipadIcon.style.backgroundPosition = 'center';
 
-			window.centerMarker = new mapboxgl.Marker({
+			window.centerMarker = new maplibregl.Marker({
 				element: helipadIcon,
 				draggable: true
 			})
@@ -881,7 +940,7 @@ $(function() {
 	initializeSources();
 	initializeMap();
 	initializeSearch();
-	initializeRectangleTool();
+	// initializeRectangleTool(); // Now called after map loads
 	initializeGridPreview();
 	initializeMoreOptions();
 	initializeDownloader();

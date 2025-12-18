@@ -17,5 +17,8 @@ class globalParam:
     TEMPORARY_SATELLITE_IMAGE    = os.path.join(TEMP_PATH,'gazebo_terrian')
     TEMPLATE_DIR_PATH            = str(Path(__file__).resolve().parents[2] / 'templates')
     
-    # Free Mapbox API Key 
-    MAPBOX_API_KEY               = "pk.eyJ1Ijoic2FpYXJhdmluZDE5NDAiLCJhIjoiY2x0d2s5cnVzMDBmeTJpcGYzcTRvenQxOSJ9.QTaaQ1TT1J4AbqlZS-akHA"  
+    # Open Topo Data API Configuration (replaces Mapbox DEM)
+    OPEN_TOPO_DATA_API_URL       = "https://api.opentopodata.org/v1/srtm30m"
+    OPEN_TOPO_DATA_TIMEOUT       = 10
+    OPEN_TOPO_DATA_MAX_LOCATIONS = 100  # API limit per request
+    ELEVATION_CACHE_DIR          = os.path.join(OUTPUT_BASE_PATH, 'elevation_cache')  

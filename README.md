@@ -2,7 +2,7 @@
 
 
 
-A super easy-to-use tool for generate 3D Gazebo terrain using real-world elevation and satellite data.
+A super easy-to-use tool for generate 3D Gazebo terrain using real-world elevation and satellite data. Now featuring **MapLibre GL** and **open-source elevation data** for complete vendor independence.
 
 
 <p align="center">
@@ -14,6 +14,9 @@ A super easy-to-use tool for generate 3D Gazebo terrain using real-world elevati
 ## Features
 
 - **Real-World Terrain Generation**: Generate 3D Gazebo worlds using actual elevation data and satellite images of any location on Earth.
+- **MapLibre GL Integration**: Modern open-source mapping library with no API key requirements
+- **Open-Source Elevation Data**: Uses Open Topo Data (SRTM 30m) for global elevation coverage without vendor lock-in
+- **Custom Geocoding**: Built-in landmark database with external API fallback for location search
 - **Configurable Spawn Location**: Change the spawn location using interactive UI marker within the region of interest
 - **Configurable Output**: Flexible output paths via environment variables for different deployment scenarios
 - **Customizable Resolution**: Adjustable tile resolution.
@@ -55,8 +58,8 @@ export GAZEBO_WORLD_PATH="~/Desktop/gazebo_models/worlds"
 
 **Default Location**: If no environment variable is set, model and worlds files are saved to:
 ```
-Models saved in **~/gazebo_terrian_generator/output/gazebo_terrain/**
-World files in **~/gazebo_terrian_generator/output/gazebo_terrain/worlds**
+Models saved in **~/gazebo_terrain_generator/output/gazebo_terrain/**
+World files in **~/gazebo_terrain_generator/output/gazebo_terrain/worlds**
 
 ```
 
@@ -81,7 +84,7 @@ Generated model follow this structure:
 
 ## 🚀 Run Gazebo World Generator
 
-1. Navigate to **gazebo_terrian_generator** and start the applciation.
+1. Navigate to **gazebo_terrain_generator** and start the applciation.
     ```bash
     source terrain_generator/bin/activate
     python scripts/server.py
@@ -121,7 +124,7 @@ Test the installation with provided sample worlds:
 
 1. **Export the sample gazebo model path**:
     ```bash
-    export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:~/gazebo_terrian_generator/sample_worlds
+    export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:~/gazebo_terrain_generator/sample_worlds
     ```
 
 2. **Launch sample world**:
@@ -129,8 +132,14 @@ Test the installation with provided sample worlds:
     gz sim prayag/prayag.sdf
     ```
 
-## 🔑 MapBox API Key
-A free api key is being used in the repo if it gets limited then please feel free to create your own API key from official [MapBox's website](https://www.mapbox.com/) and replace it in the [`configuration file`](scripts/utils/param.py)
+## 🔑 No API Keys Required!
+
+This application now uses completely **open-source services**:
+- **MapLibre GL** for mapping (no API key needed)
+- **Open Topo Data** for elevation (free SRTM 30m data)
+- **Nominatim** for geocoding (OpenStreetMap-based)
+
+Simply install and run - no configuration required!
 
 ## Important Disclaimer
 

@@ -128,16 +128,17 @@ hr {
 	padding-right: 10px;
 }
 
-.mapboxgl-ctrl-geocoder {
+.maplibregl-ctrl-geocoder {
 	display: none !important;
 }
 
-.mapbox-gl-draw_ctrl-draw-btn {
+.maplibre-gl-draw_ctrl-draw-btn {
 	display: none !important;
 }
 
 #progress-radial {
-	width: 70%;
+	width: 150px;
+	height: 150px;
 	margin: auto;
 	margin-top: 20px;
 }

@@ -7,7 +7,7 @@ import uuid
 import base64
 from pathlib import Path
 import mimetypes
-from utils.demTilesDownloader import download_dem_data
+from utils.elevation_service import download_elevation_data
 from utils.file_writer import FileWriter
 from utils.utils import Utils
 from utils.gazebo_world_generator import GazeboTerrianGenerator
@@ -35,7 +35,7 @@ def process_end_download(bounds, zoom_level, outputDirectory, outputFile, filePa
 	 	#Perform the long-running task
 		FileWriter.close(lock, os.path.join(globalParam.OUTPUT_BASE_PATH, outputDirectory), filePath, zoom_level)
 		true_boundaries = maptile_utiles.get_true_boundaries(bounds, zoom_level)
-		download_dem_data(true_boundaries, os.path.join(globalParam.OUTPUT_BASE_PATH, "dem"))
+		download_elevation_data(true_boundaries, os.path.join(globalParam.OUTPUT_BASE_PATH, "dem"))
 		orthodir_path = os.path.join(globalParam.OUTPUT_BASE_PATH, outputDirectory)
 		terrian_generator = GazeboTerrianGenerator(orthodir_path)
 		terrian_generator.generate_gazebo_world()
@@ -45,32 +45,6 @@ def process_end_download(bounds, zoom_level, outputDirectory, outputFile, filePa
 	except Exception as e:
 		task_status["status"] = "failed"
 		print(f"Error during processing: {e}")
-
-
-def validate_mapbox_key(api_key):
-    try:
-        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/0,0,1/1x1?access_token={api_key}"
-        response = requests.get(url, timeout=5)  # Add timeout
-        
-        if response.status_code == 200:
-            print("Mapbox API key is validated successfully.")
-            return True
-        elif response.status_code == 401:
-            print("Invalid Mapbox API key.")
-            return False
-        else:
-            print(f"Unexpected response: {response.status_code}")
-            print(response.text)
-            return False
-    except requests.exceptions.ConnectionError:
-        print(" Cannot validate Mapbox API key - no internet connection.")
-        return False  
-    except requests.exceptions.Timeout:
-        print("Mapbox API validation timed out.")
-        return False  
-    except Exception as e:
-        print(f"Error validating Mapbox API key: {e}")
-        return False 
 
 
 @app.route('/task-status', methods=['GET'])
@@ -182,8 +156,6 @@ def serve_static(path):
 	return send_from_directory(file_dir, path, mimetype=mime_type)
 
 if __name__ == '__main__':
-	
-	if not validate_mapbox_key(globalParam.MAPBOX_API_KEY):
-		exit(1)
-	print("Starting Flask server...")
+	print("Starting Flask server with MapLibre GL and Open Topo Data...")
+	print("No API key validation required - using open source services")
 	app.run(host='0.0.0.0', port=8080, threaded=True)
