@@ -268,7 +268,11 @@ class CustomGeocoder:
             List[Dict]: External search results
         """
         import requests
+        import urllib3
         import time
+        
+        # Disable SSL warnings for this session
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         
         results = []
         
@@ -286,7 +290,7 @@ class CustomGeocoder:
                 'User-Agent': 'Gazebo-Terrain-Generator/1.0'
             }
             
-            response = requests.get(url, params=params, headers=headers, timeout=5)
+            response = requests.get(url, params=params, headers=headers, timeout=5, verify=False)
             response.raise_for_status()
             
             data = response.json()

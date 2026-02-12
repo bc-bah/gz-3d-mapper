@@ -12,17 +12,23 @@
 	<link href='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css' rel='stylesheet' />
 
 	<!-- Geocoder disabled to prevent warnings -->
+	
+	<!-- Use proven working Mapbox GL Draw -->
+	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js'></script>
 	<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css' type='text/css'/>
 	
-	<!-- Rectangle plugin -->
-	<script src='mapbox-gl-draw-rectangle-mode.min.js'></script>
+	<!-- Skip rectangle plugin for now - use polygon instead -->
+	<!-- <script src='mapbox-gl-draw-rectangle-mode.min.js'></script> -->
 
 	<script src='https://rawgit.com/kimmobrunfeldt/progressbar.js/1.0.0/dist/progressbar.js'></script>
 
 	<script src="async.min.js"></script>
 	<script src="turf.min.js"></script>
 
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i,700,700i" rel="stylesheet"> 
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 	<script src="materialize/js/materialize.min.js"></script>
 	<link href='materialize/css/materialize.min.css' rel='stylesheet' type='text/css' />
 
@@ -67,8 +73,17 @@
 
 		<div class='center-align sidebar-section'>
 			<p>
-				<a class="waves-effect waves-light z-depth-0 btn-small orange darken-3" id='rectangle-draw-button'>Draw Region</a>
+				<a class="btn btn-primary btn-small" id='rectangle-draw-button'>Draw Region</a>
 			</p>
+		</div>
+
+		<!-- Center Point Coordinates -->
+		<div class='sidebar-section' id='coordinates-section' style="display: none;">
+			<div class="step-title" style="font-size: 0.9em; margin-bottom: 10px;">Center Point</div>
+			<div id='coordinates'>
+				<p style="margin: 5px 0; font-size: 0.85em;">Latitude: <span id="point-lat">--</span></p>
+				<p style="margin: 5px 0; font-size: 0.85em;">Longitude: <span id="point-lng">--</span></p>
+			</div>
 		</div>
 
 		<div class='step-number'>
@@ -89,11 +104,11 @@
 
 			<div class="row">
 				<div class="input-field col s10">
-					<input id="source-box" name="tile-source" type="text" value='http://ecn.t0.tiles.virtualearth.net/tiles/a{quad}.jpeg?g=129&mkt=en&stl=H'>
+					<input id="source-box" name="tile-source" type="text" value='https://tile.openstreetmap.org/{z}/{x}/{y}.png'>
 					<label for="source-box">Map Tile Source</label>
 				</div>
 				<div class="input-field col s2">
-					<a class='waves-effect waves-light btn-small blue-grey lighten-2 z-depth-0 dropdown-trigger' id='source-select' href='#' data-target='sources'>⯆</a>
+					<a class='btn btn-secondary dropdown-trigger' id='source-select' href='#' data-target='sources'>⯆</a>
 
 					<ul id='sources' class='dropdown-content'>
 					</ul>
@@ -101,7 +116,7 @@
 			</div>
 
 			<div class='center-align'>
-				<a class="waves-effect waves-light z-depth-0 btn-small orange darken-3" id='grid-preview-button'>Preview Grid</a>
+				<a class="btn btn-secondary btn-small" id='grid-preview-button'>Preview Grid</a>
 			</div>
 
 		</div>
@@ -128,7 +143,7 @@
 			</div>
 		</div>
 
-		<button class='waves-effect waves-light z-depth-0 btn-large cyan darken-2 bottom-button' id='download-button'>Generate Terrain</button>
+		<button class='btn btn-primary btn-large bottom-button' id='download-button'>Generate Terrain</button>
 
 	</div>
 

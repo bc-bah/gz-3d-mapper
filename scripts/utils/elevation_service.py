@@ -4,9 +4,16 @@ import time
 import hashlib
 import requests
 import numpy as np
+import urllib3
+import ssl
 from multiprocessing import Pool, cpu_count
 from .param import globalParam
 from .maptile_utils import maptile_utiles
+
+# Disable SSL warnings and verification for development
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Disable SSL verification globally for requests
+requests.packages.urllib3.disable_warnings()
 
 
 class ElevationService:
@@ -107,7 +114,8 @@ class ElevationService:
             response = requests.get(
                 self.api_url,
                 params={'locations': locations},
-                timeout=self.timeout
+                timeout=self.timeout,
+                verify=False  # Disable SSL certificate verification
             )
             response.raise_for_status()
             

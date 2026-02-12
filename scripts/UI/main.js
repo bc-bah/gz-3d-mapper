@@ -13,33 +13,46 @@ $(function() {
 	
 	var sources = {
 
-		"Bing Maps": "http://ecn.t0.tiles.virtualearth.net/tiles/r{quad}.jpeg?g=129&mkt=en&stl=H",
-		"Bing Maps Satellite": "http://ecn.t0.tiles.virtualearth.net/tiles/a{quad}.jpeg?g=129&mkt=en&stl=H",
-		"Bing Maps Hybrid": "http://ecn.t0.tiles.virtualearth.net/tiles/h{quad}.jpeg?g=129&mkt=en&stl=H",
+		"=== FREE / NO AUTH REQUIRED ===": "",
+		
+		"OpenStreetMap": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+		"OpenStreetMap DE": "https://tile.openstreetmap.de/{z}/{x}/{y}.png",
+		"Wikimedia Maps": "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
+		
+		"div-osm": "",
 
-		"div-1B": "",
+		"ESRI World Imagery (Free)": "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+		"ESRI World Topo (Free)": "https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+		"ESRI World Street (Free)": "https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+
+		"div-cycle": "",
+
+		"OpenCycleMap": "https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png",
+		"OpenTopoMap": "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+		"Stamen Terrain": "https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png",
+		"Stamen Toner": "https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png",
+
+		"div-nasa": "",
+
+		"NASA GIBS (Free)": "https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_CorrectedReflectance_TrueColor/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
+
+		"=== REQUIRES AUTH / API KEY ===": "",
 
 		"Google Maps": "https://mt0.google.com/vt?lyrs=m&x={x}&s=&y={y}&z={z}",
-		"Google Maps Satellite": "https://mt0.google.com/vt?lyrs=s&x={x}&s=&y={y}&z={z}",
-		"Google Maps Hybrid": "https://mt0.google.com/vt?lyrs=h&x={x}&s=&y={y}&z={z}",
-		"Google Maps Terrain": "https://mt0.google.com/vt?lyrs=p&x={x}&s=&y={y}&z={z}",
+		"Google Satellite": "https://mt0.google.com/vt?lyrs=s&x={x}&s=&y={y}&z={z}",
+		"Google Hybrid": "https://mt0.google.com/vt?lyrs=h&x={x}&s=&y={y}&z={z}",
+		"Google Terrain": "https://mt0.google.com/vt?lyrs=p&x={x}&s=&y={y}&z={z}",
 
-		"div-2": "",
+		"div-bing": "",
 
-		"Open Street Maps": "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-		"Open Cycle Maps": "http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png",
-		"Open PT Transport": "http://openptmap.org/tiles/{z}/{x}/{y}.png",
+		"Bing Maps": "https://ecn.t0.tiles.virtualearth.net/tiles/r{quad}.jpeg?g=129&mkt=en&stl=H",
+		"Bing Satellite": "https://ecn.t0.tiles.virtualearth.net/tiles/a{quad}.jpeg?g=129&mkt=en&stl=H",
+		"Bing Hybrid": "https://ecn.t0.tiles.virtualearth.net/tiles/h{quad}.jpeg?g=129&mkt=en&stl=H",
 
-		"div-3": "",
+		"div-mapbox": "",
 
-		"ESRI World Imagery": "http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-		"Wikimedia Maps": "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
-		"NASA GIBS": "https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_CorrectedReflectance_TrueColor/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
-
-		"div-4": "",
-
-		"Carto Light": "http://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
-		"Stamen Toner B&W": "http://a.tile.stamen.com/toner/{z}/{x}/{y}.png",
+		"Mapbox Streets": "https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=YOUR_MAPBOX_TOKEN",
+		"Mapbox Satellite": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=YOUR_MAPBOX_TOKEN",
 
 	};
 
@@ -50,7 +63,28 @@ $(function() {
 
 		map = new maplibregl.Map({
 			container: 'map-view',
-			style: 'https://demotiles.maplibre.org/style.json', // Open source style
+			style: {
+				version: 8,
+				sources: {
+					'osm-tiles': {
+						type: 'raster',
+						tiles: [
+							'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+						],
+						tileSize: 256,
+						attribution: '© OpenStreetMap contributors'
+					}
+				},
+				layers: [
+					{
+						id: 'osm-tiles-layer',
+						type: 'raster',
+						source: 'osm-tiles',
+						minzoom: 0,
+						maxzoom: 19
+					}
+				]
+			},
 			center: [-73.983652, 40.755024], 
 			zoom: 12
 		});
@@ -62,22 +96,224 @@ $(function() {
 			// Debug: Check what's available
 			console.log('Available globals:');
 			console.log('maplibregl:', typeof maplibregl);
-			console.log('MaplibreDraw:', typeof MaplibreDraw);
-			console.log('window.MaplibreDraw:', typeof window.MaplibreDraw);
+			console.log('MapboxDraw:', typeof MapboxDraw);
+			console.log('window.MapboxDraw:', typeof window.MapboxDraw);
 			console.log('DrawRectangle:', typeof DrawRectangle);
 			
+			// Check all possible draw library names
+			const drawNames = ['MapboxDraw', 'mapboxDraw', 'MaplibreDraw', 'Draw', 'GLDraw'];
+			drawNames.forEach(name => {
+				if (window[name]) console.log(`Found ${name}:`, typeof window[name]);
+			});
+			
+			// List all window properties containing 'draw' (case insensitive)
+			const drawProps = Object.keys(window).filter(k => k.toLowerCase().includes('draw'));
+			console.log('All draw-related properties:', drawProps);
+			
 			// Initialize center point if available
-			if (typeof initializeCenterPoint === 'function') {
-				initializeCenterPoint(map);
+			console.log('🎯 About to initialize center point...');
+			try {
+				if (typeof initializeCenterPoint === 'function') {
+					initializeCenterPoint(map);
+					console.log('✅ Center point initialized successfully');
+				} else {
+					console.log('ℹ️ Center point function not available');
+				}
+			} catch (error) {
+				console.error('❌ Error in center point initialization:', error);
 			}
 			
-			initializeRectangleTool();
+			console.log('🎯 About to initialize rectangle tool...');
+			
+			// Try initializing rectangle tool with retry for fallback loading
+			function tryInitializeRectangleTool(attempt = 1) {
+				const maxAttempts = 5;
+				if (attempt > maxAttempts) {
+					console.error('❌ Failed to initialize drawing tools after', maxAttempts, 'attempts');
+					return;
+				}
+				
+				// Check if any drawing library is available
+				const hasDrawLib = typeof MapboxDraw !== 'undefined' || 
+								 typeof window.MapboxDraw !== 'undefined';
+				
+				if (hasDrawLib) {
+					console.log('✅ Drawing library found, initializing...');
+					initializeRectangleTool();
+				} else {
+					console.log(`⏳ Waiting for drawing library to load (attempt ${attempt}/${maxAttempts})...`);
+					setTimeout(() => tryInitializeRectangleTool(attempt + 1), 1000);
+				}
+			}
+			
+			tryInitializeRectangleTool();
 		});
 
-		// Skip geocoder initialization to avoid warnings
-		// The search functionality will work via manual location entry
-		console.log('Geocoder disabled to prevent warnings');
+		// Add basemap selector control
+		addBasemapSelector(map);
+
+		// Add simple location search functionality
+		console.log('Adding location search functionality');
+		
+		// Function to search for location using Nominatim
+		async function searchLocation(query) {
+			try {
+			// Show immediate acknowledgement
+			M.toast({html: `🔍 Searching for "${query}"...`, displayLength: 1000});
+			
+			const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+			const results = await response.json();
+			
+			if (results.length > 0) {
+				const result = results[0];
+				const lat = parseFloat(result.lat);
+				const lon = parseFloat(result.lon);
+				
+				console.log(`Found location: ${result.display_name} at [${lon}, ${lat}]`);
+				
+				// Fly to location
+				map.flyTo({
+					center: [lon, lat],
+					zoom: 12,
+					duration: 2000
+				});
+				
+				M.toast({html: `✓ Found: ${result.display_name}`, displayLength: 3000});
+			} else {
+				M.toast({html: '❌ Location not found', displayLength: 2000});
+			}
+		} catch (error) {
+			console.error('Search error:', error);
+			M.toast({html: '⚠️ Search failed - please try again', displayLength: 3000});
+		}
 	}
+	
+	// Add event listener for location search
+	$('#search-form').on('submit', function(e) {
+		e.preventDefault();
+		const location = $('#location-box').val().trim();
+		if (location) {
+			console.log('Searching for:', location);
+			searchLocation(location);
+		}
+	});
+}
+
+function addBasemapSelector(map) {
+	// Define available basemaps
+	const basemaps = {
+		'OpenStreetMap': {
+			name: 'OpenStreetMap',
+			url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+		},
+		'Satellite': {
+			name: 'Satellite Imagery',
+			url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+		},
+		'Terrain': {
+			name: 'Terrain',
+			url: 'https://tile.opentopomap.org/{z}/{x}/{y}.png'
+		},
+		'CartoDB': {
+			name: 'CartoDB Light',
+			url: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
+		}
+	};
+
+	let currentBasemap = 'OpenStreetMap';
+
+	// Create basemap control container
+	const basemapControl = document.createElement('div');
+	basemapControl.className = 'basemap-control';
+	
+	// Create header
+	const header = document.createElement('div');
+	header.className = 'basemap-control-header';
+	header.textContent = 'Basemap';
+	
+	// Create options container
+	const options = document.createElement('div');
+	options.className = 'basemap-control-options';
+	
+	// Add basemap options
+	Object.keys(basemaps).forEach(key => {
+		const option = document.createElement('div');
+		option.className = 'basemap-option';
+		if (key === currentBasemap) {
+			option.classList.add('active');
+		}
+		option.textContent = basemaps[key].name;
+		option.dataset.basemap = key;
+		
+		option.addEventListener('click', () => {
+			// Remove active class from all options
+			document.querySelectorAll('.basemap-option').forEach(opt => {
+				opt.classList.remove('active');
+			});
+			
+			// Add active class to clicked option
+			option.classList.add('active');
+			
+			// Update map source
+			currentBasemap = key;
+			
+			// Create new style with updated source
+			const newStyle = {
+				version: 8,
+				sources: {
+					'osm-tiles': {
+						type: 'raster',
+						tiles: [basemaps[key].url],
+						tileSize: 256,
+						attribution: basemaps[key].attribution || '© Map data providers'
+					}
+				},
+				layers: [
+					{
+						id: 'osm-layer',
+						type: 'raster',
+						source: 'osm-tiles'
+					}
+				]
+			};
+			
+			// Update map style
+			map.setStyle(newStyle);
+			
+			// Re-add draw control after style change
+			map.once('style.load', () => {
+				if (typeof draw !== 'undefined' && draw) {
+					map.addControl(draw, 'top-left');
+				}
+			});
+			
+			// Close dropdown
+			basemapControl.classList.remove('open');
+			
+			console.log(`Switched to basemap: ${basemaps[key].name}`);
+			M.toast({html: `Basemap: ${basemaps[key].name}`, displayLength: 2000});
+		});
+		
+		options.appendChild(option);
+	});
+	
+	header.addEventListener('click', () => {
+		basemapControl.classList.toggle('open');
+	});
+	
+	// Close dropdown when clicking outside
+	document.addEventListener('click', (e) => {
+		if (!basemapControl.contains(e.target)) {
+			basemapControl.classList.remove('open');
+		}
+	});
+	
+	basemapControl.appendChild(header);
+	basemapControl.appendChild(options);
+	
+	// Add to map container
+	map.getContainer().appendChild(basemapControl);
+}
 
 	function initializeMaterialize() {
 		$('select').formSelect();
@@ -93,32 +329,35 @@ $(function() {
 		for(var key in sources) {
 			var url = sources[key];
 
+			// Handle section dividers
 			if(url == "") {
-				dropdown.append("<hr/>");
+				if(key.startsWith("===")) {
+					// Create header for categories
+					var header = $("<li class='dropdown-header'></li>");
+					header.text(key);
+					dropdown.append(header);
+				} else {
+					// Regular divider
+					dropdown.append("<li class='divider'></li>");
+				}
 				continue;
 			}
 
-			var item = $("<li><a></a></li>");
+			var item = $("<li><a href='#!'></a></li>");
 			item.attr("data-url", url);
 			item.find("a").text(key);
 
 			item.click(function() {
 				var url = $(this).attr("data-url");
 				$("#source-box").val(url);
-			})
+				M.toast({html: 'Tile source updated: ' + $(this).find('a').text(), displayLength: 2000});
+			});
 
 			dropdown.append(item);
 		}
 	}
 
-	function initializeSearch() {
-		$("#search-form").submit(function(e) {
-			var location = $("#location-box").val();
-			geocoder.query(location);
-
-			e.preventDefault();
-		})
-	}
+	// initializeSearch - removed, search functionality integrated into map initialization
 
 	function initializeMoreOptions() {
 
@@ -135,45 +374,52 @@ $(function() {
 
 	function initializeRectangleTool() {
 		
-		console.log('Initializing rectangle tool...');
+		console.log('🔧 Initializing rectangle tool...');
 		
-		// Check for MapLibre GL Draw library with Mapbox fallback
+		// Check for drawing library
 		var DrawClass = null;
 		if (typeof MapboxDraw !== 'undefined') {
 			DrawClass = MapboxDraw;
-			console.log('✅ Found MapboxDraw (compatible with MapLibre)');
+			console.log('✅ Found MapboxDraw');
 		} else if (window.MapboxDraw) {
 			DrawClass = window.MapboxDraw;
 			console.log('✅ Found window.MapboxDraw');
-		} else if (typeof MaplibreDraw !== 'undefined') {
-			DrawClass = MaplibreDraw;
-			console.log('✅ Found MaplibreDraw');
-		} else if (window.MaplibreDraw) {
-			DrawClass = window.MaplibreDraw;
-			console.log('✅ Found window.MaplibreDraw');
 		} else {
 			console.error('❌ No drawing library found!');
 			console.log('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('draw')));
-			
-			// Create a fallback message
-			document.getElementById('map-view').insertAdjacentHTML('afterbegin', 
-				'<div style="position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 1000;">Drawing tools failed to load</div>');
 			return;
 		}
 		
-		// Simple check and fallback approach
+		// Initialize basic drawing tools
 		try {
 			draw = new DrawClass({
-				displayControlsDefault: true
+				displayControlsDefault: true,
+				controls: {
+					polygon: true,
+					line_string: false,
+					point: false,
+					trash: true
+				}
 			});
 			
 			console.log('Draw instance created:', draw);
 			map.addControl(draw);
 			console.log('Draw control added successfully');
 			
-			// Add success indicator
-			document.getElementById('map-view').insertAdjacentHTML('afterbegin', 
-				'<div style="position: absolute; top: 10px; right: 10px; background: green; color: white; padding: 5px; z-index: 1000;">Drawing tools loaded ✓</div>');
+			// Store reference globally
+			window.mapDraw = draw;
+			
+			// Debug: Check if controls are actually in DOM
+			setTimeout(() => {
+				const controls = document.querySelectorAll('[class*="draw"]');
+				console.log('Found draw controls in DOM:', controls.length);
+				controls.forEach((ctrl, i) => {
+					console.log(`Control ${i}:`, ctrl.className, ctrl.style.display);
+				});
+			}, 1000);
+			
+			// Success - no overlay message to avoid interference
+			console.log('✅ Drawing tools successfully loaded and ready');
 			
 		} catch (error) {
 			console.error('Error initializing drawing tools:', error);
@@ -338,15 +584,23 @@ $(function() {
 	}
 
 	function startDrawing() {
+		if (!draw) {
+			console.error('Draw control not initialized');
+			M.toast({html: 'Drawing tools not ready', displayLength: 2000});
+			return;
+		}
+		
 		removeGrid();
 		draw.deleteAll();
-		draw.changeMode('draw_rectangle');
+		draw.changeMode('draw_polygon');
 
 		// Remove markers if they exist
 		removeLaunchPadMarker();
 
 		M.Toast.dismissAll();
-		M.toast({html: 'Click two points on the map to draw a region', displayLength: 3000})
+		M.toast({html: 'Click to draw a polygon region on the map', displayLength: 3000});
+		
+		console.log('✅ Polygon drawing mode activated');
 	}
 
 	function initializeGridPreview() {
@@ -939,7 +1193,7 @@ $(function() {
 	initializeMaterialize();
 	initializeSources();
 	initializeMap();
-	initializeSearch();
+	// initializeSearch(); // Removed - search functionality integrated into map initialization
 	// initializeRectangleTool(); // Now called after map loads
 	initializeGridPreview();
 	initializeMoreOptions();

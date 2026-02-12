@@ -4,7 +4,7 @@ let boundingBox = null;
 
 function initializeCenterPoint(map) {
     // Create a draggable marker for the center point
-    centerPoint = new mapboxgl.Marker({
+    centerPoint = new maplibregl.Marker({
         draggable: true,
         color: '#FF0000'
     });
@@ -50,35 +50,23 @@ function initializeCenterPoint(map) {
 }
 
 function updateCoordinatesDisplay(lat, lng) {
-    const coordsDiv = document.getElementById('coordinates');
-    if (!coordsDiv) {
-        const div = document.createElement('div');
-        div.id = 'coordinates';
-        div.className = 'coordinates-display';
-        div.innerHTML = `
-            <h4>Center Point</h4>
-            <p>Latitude: <span id="point-lat">${lat.toFixed(6)}</span></p>
-            <p>Longitude: <span id="point-lng">${lng.toFixed(6)}</span></p>
-        `;
-        document.body.appendChild(div);
-    } else {
-        document.getElementById('point-lat').textContent = lat.toFixed(6);
-        document.getElementById('point-lng').textContent = lng.toFixed(6);
+    // Show the coordinates section in the sidebar
+    const coordsSection = document.getElementById('coordinates-section');
+    if (coordsSection) {
+        coordsSection.style.display = 'block';
+    }
+    
+    // Update the coordinate values
+    const latSpan = document.getElementById('point-lat');
+    const lngSpan = document.getElementById('point-lng');
+    if (latSpan && lngSpan) {
+        latSpan.textContent = lat.toFixed(6);
+        lngSpan.textContent = lng.toFixed(6);
     }
 }
 
 function updatePointLocation(lat, lng) {
-    fetch('/update-point', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            latitude: lat,
-            longitude: lng
-        })
-    })
-    .then(response => response.json())
-    .then(data => console.log('Point updated:', data))
-    .catch(error => console.error('Error:', error));
+    // Store point location locally (no server communication needed)
+    window.launchLocation = [lng, lat];
+    console.log('Point updated locally:', { lat, lng });
 }
